@@ -81,12 +81,12 @@ func printAsTable(repositoryConfigs []CommonRepositoryDetails) {
 		risk := false
 		// Checking if Exclude & Include patterns are empty OR repo is local without priority resolution OR repo is not indexing by xray
 		if strings.EqualFold(repositoryConfig.Rclass, "local") {
-			if (repositoryConfig.PriorityResolution == false) && (repositoryConfig.XrayIndex == false) {
+			if (repositoryConfig.PriorityResolution == false) || (repositoryConfig.XrayIndex == false) {
 				risk = true
 				riskCount += 1
 			}
 		} else if strings.EqualFold(repositoryConfig.Rclass, "remote") {
-			if (repositoryConfig.ExcludesPattern == "") && (repositoryConfig.IncludesPattern == "**/*") && (repositoryConfig.XrayIndex == false) {
+			if ((repositoryConfig.ExcludesPattern == "") && (repositoryConfig.IncludesPattern == "**/*")) || (repositoryConfig.XrayIndex == false) {
 				risk = true
 				riskCount += 1
 			}
