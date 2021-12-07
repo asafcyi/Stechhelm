@@ -9,6 +9,7 @@ import (
 	"github.com/jfrog/jfrog-cli-core/v2/plugins/components"
 	"github.com/jfrog/jfrog-cli-core/v2/utils/config"
 	"os"
+	"strings"
 )
 
 func GetAuditCommand() components.Command {
@@ -79,8 +80,18 @@ func printAsTable(repositoryConfigs []CommonRepositoryDetails) {
 	for i, repositoryConfig := range repositoryConfigs {
 		risk := false
 		// Checking if Exclude & Include patterns are empty OR repo is local without priority resolution OR repo is not indexing by xray
-		if ((repositoryConfig.ExcludesPattern == "") && (repositoryConfig.IncludesPattern == "**/*")) ||
-			((repositoryConfig.PriorityResolution == false) && (repositoryConfig.Rclass == "local")) || (repositoryConfig.XrayIndex == false) {
+		if strings.EqualFold(repositoryConfig.Rclass, "local") {
+			if (repositoryConfig.PriorityResolution == false) && (repositoryConfig.XrayIndex == false) {
+				risk = true
+				riskCount += 1
+			}
+		} else if strings.EqualFold(repositoryConfig.Rclass, "remote") {
+			if (repositoryConfig.ExcludesPattern == "") && (repositoryConfig.IncludesPattern == "**/*") && (repositoryConfig.XrayIndex == false) {
+				risk = true
+				riskCount += 1
+			}
+		} else if strings.EqualFold(repositoryConfig.Rclass, "virtual") {
+			// TODO: Use the same func of graph.go -- checkVirtualRepoSafety()
 			risk = true
 			riskCount += 1
 		}
